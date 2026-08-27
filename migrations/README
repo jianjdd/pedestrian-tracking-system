@@ -1,0 +1,15 @@
+Alembic migrations for pedestrian-tracking-system.
+
+Common commands:
+
+1. Create a migration from current ORM models:
+   alembic revision --autogenerate -m "describe_change"
+
+2. Apply latest migrations:
+   alembic upgrade head
+
+3. Show current revision:
+   alembic current
+
+4. Roll back one revision:
+   alembic downgrade -1

@@ -1,0 +1,31 @@
+# YOLOv8 训练基础依赖 (Featurize 平台适用)
+
+# 核心深度学习库 (通常 Featurize 镜像已预装，但写上以防万一)
+# 注意：在 Featurize 租用实例时，建议直接选择 PyTorch 2.0+ 的官方镜像
+torch>=1.8.0
+torchvision>=0.9.0
+
+# 基础计算和处理库
+numpy>=1.22.2
+pandas>=1.1.4
+scipy>=1.4.1
+
+# 图像与视觉
+opencv-python>=4.6.0
+Pillow>=7.1.2
+
+# 配置文件与进度条
+PyYAML>=5.3.1
+tqdm>=4.64.0
+
+# 绘图和可视化 (用于生成训练曲线、混淆矩阵等)
+matplotlib>=3.3.0
+seaborn>=0.11.0
+
+# 系统和实用工具
+psutil
+thop>=0.1.1  # 用于计算 FLOPs (Profile 功能)
+
+# 避免有些环境中报缺少的问题
+requests>=2.23.0
+tensorboard>=2.13.0  # 用于训练过程可视化

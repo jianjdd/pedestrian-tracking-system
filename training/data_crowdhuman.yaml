@@ -1,0 +1,9 @@
+# CrowdHuman 数据集配置
+# 使用 convert_crowdhuman.py 转换后，修改 path 为你的实际输出路径
+
+path: E:/datasets/CrowdHuman_YOLO   # ← 转换后的输出目录
+train: images/train
+val: images/val
+
+nc: 1
+names: ['person']

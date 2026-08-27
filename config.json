@@ -1,0 +1,62 @@
+{
+    "yolo_params": {
+        "confidence": 0.65
+    },
+    "tracking_params": {
+        "max_age": 3,
+        "min_hits": 5
+    },
+    "display_params": {
+        "invisible_threshold": 0,
+        "show_bbox": true,
+        "show_label": true,
+        "show_center": true,
+        "show_trajectory": true,
+        "stats_font_scale": 0.8,
+        "line_thickness": 3,
+        "bbox_thickness": 2,
+        "label_font_scale": 0.6,
+        "center_size": 4,
+        "avg_frame_window": 30,
+        "stats_font_color": [
+            0,
+            255,
+            0
+        ],
+        "label_font_color": [
+            255,
+            0,
+            0
+        ],
+        "bbox_color": [
+            255,
+            0,
+            0
+        ],
+        "center_color": [
+            0,
+            255,
+            0
+        ],
+        "trajectory_color": [
+            0,
+            255,
+            255
+        ],
+        "line_color": [
+            0,
+            255,
+            0
+        ]
+    },
+    "last_line_points": [
+        [
+            6,
+            600
+        ],
+        [
+            1138,
+            547
+        ]
+    ]
+}

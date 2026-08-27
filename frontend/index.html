@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>行人跟踪系统 - Web</title>
+    <link rel="stylesheet" href="/src/styles/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="logo">🎯</span>
+        <h1 class="app-title">行人跟踪计数系统</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="status-badge" id="systemStatus">
+          <span class="status-dot"></span>
+          <span id="statusText">未就绪</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <main class="video-area">
+        <div class="video-box" id="videoWrapper">
+          <img id="videoFeed" src="" alt="视频流" />
+          <canvas id="lineCanvas"></canvas>
+          <div class="video-empty" id="videoPlaceholder">
+            <div class="empty-icon">📹</div>
+            <p>请先加载模型并选择视频源</p>
+          </div>
+        </div>
+        <div class="video-footer">
+          <div class="line-tools">
+            <button class="tb" id="btnDrawLine" disabled>✏️ 绘制</button>
+            <button class="tb" id="btnEditLine" disabled>✂️ 编辑</button>
+            <button class="tb" id="btnClearLine" disabled>🗑️ 清除</button>
+            <span class="line-hint" id="lineStatus">未设置计数线</span>
+          </div>
+          <div class="quick-stats">
+            <div class="qs">
+              <span class="qs-label">A->B</span
+              ><span class="qs-val" id="statAtoB">0</span>
+            </div>
+            <div class="qs">
+              <span class="qs-label">B->A</span
+              ><span class="qs-val" id="statBtoA">0</span>
+            </div>
+            <div class="qs total">
+              <span class="qs-label">总计</span
+              ><span class="qs-val" id="statTotal">0</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-tabs">
+          <button class="tab active" onclick="openTab('tab-control', this)">
+            控制
+          </button>
+          <button class="tab" onclick="openTab('tab-stats', this)">统计</button>
+          <button class="tab" onclick="openTab('tab-settings', this)">
+            设置
+          </button>
+        </div>
+
+        <div class="tab-body active" id="tab-control">
+          <section class="sec">
+            <h3 class="sec-title">🤖 模型</h3>
+            <div class="sec-inner">
+              <div class="badge" id="modelStatus">未加载</div>
+              <div class="row">
+                <select id="modelSelect" style="flex: 1">
+                  <option value="">-- 选择服务器模型 --</option>
+                </select>
+                <button class="btn sm primary" onclick="loadLocalModel()">
+                  加载
+                </button>
+              </div>
+              <input type="file" id="modelFile" accept=".pt" hidden />
+              <button
+                class="btn secondary"
+                onclick="document.getElementById('modelFile').click()"
+              >
+                📂 加载模型文件
+              </button>
+            </div>
+          </section>
+
+          <section class="sec">
+            <h3 class="sec-title">🎥 视频源</h3>
+            <div class="sec-inner">
+              <div class="badge" id="sourceStatus">未选择</div>
+              <div class="row">
+                <select id="cameraSelect" style="flex: 1">
+                  <option value="">-- 加载中... --</option>
+                </select>
+                <button
+                  class="btn sm primary"
+                  id="btnUseCamera"
+                  disabled
+                  onclick="useCamera()"
+                >
+                  加载
+                </button>
+              </div>
+              <input
+                type="file"
+                id="videoFile"
+                accept=".mp4,.avi,.mov,.mkv,.flv"
+                hidden
+              />
+              <button
+                class="btn secondary"
+                onclick="document.getElementById('videoFile').click()"
+              >
+                📂 加载视频文件
+              </button>
+              <div class="row">
+                <label class="lbl">模式</label>
+                <select id="modeSelect" disabled>
+                  <option value="realtime">实时检测</option>
+                  <option value="fast">快速分析</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <section class="sec">
+            <h3 class="sec-title">🎯 监测控制</h3>
+            <div class="sec-inner">
+              <div id="classContainer">
+                <div style="display: flex; align-items: center; gap: 10px">
+                  <label
+                    class="class-chip"
+                    style="
+                      flex: 1;
+                      justify-content: space-between;
+                      padding: 10px 14px;
+                      background: var(--c-surface);
+                    "
+                  >
+                    <span style="display: flex; align-items: center; gap: 8px">
+                      <span style="font-size: 1.2em">🚶</span> 行人检测开启
+                    </span>
+                    <input
+                      type="checkbox"
+                      id="pedestrianToggle"
+                      value="person"
+                      checked
+                      onchange="syncClasses()"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="sec">
+            <h3 class="sec-title">🎮 计数控制</h3>
+            <div class="sec-inner">
+              <div class="ctrl-grid">
+                <button
+                  class="btn go"
+                  id="btnStart"
+                  disabled
+                  onclick="startCounting()"
+                >
+                  ▶ 开始
+                </button>
+                <button
+                  class="btn warn"
+                  id="btnPause"
+                  disabled
+                  onclick="pauseCounting()"
+                >
+                  ⏸ 暂停
+                </button>
+                <button
+                  class="btn danger"
+                  id="btnStop"
+                  disabled
+                  onclick="stopCounting()"
+                >
+                  ⏹ 停止
+                </button>
+                <button
+                  class="btn secondary"
+                  id="btnReset"
+                  disabled
+                  onclick="resetCount()"
+                >
+                  🔄 重置
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="sec">
+            <h3 class="sec-title">📈 实时趋势</h3>
+            <div class="sec-inner">
+              <div class="chart-wrap"><canvas id="realtimeChart"></canvas></div>
+            </div>
+          </section>
+
+          <section class="sec">
+            <h3 class="sec-title">💾 日志</h3>
+            <div class="sec-inner">
+              <button class="btn accent" onclick="saveLog()">
+                保存日志并生成图表
+              </button>
+              <button class="btn secondary" onclick="listLogs()">
+                查看历史日志
+              </button>
+              <div id="logList" style="display: none"></div>
+            </div>
+          </section>
+        </div>
+
+        <div class="tab-body" id="tab-stats">
+          <section class="sec">
+            <h3 class="sec-title">总计统计</h3>
+            <div class="sec-inner">
+              <div class="kpi-row">
+                <div class="kpi">
+                  <div class="kpi-v" id="detailedCurrent">0</div>
+                  <div class="kpi-l">当前目标</div>
+                </div>
+                <div class="kpi">
+                  <div class="kpi-v" id="detailedAtoB">0</div>
+                  <div class="kpi-l">A->B</div>
+                </div>
+                <div class="kpi">
+                  <div class="kpi-v" id="detailedBtoA">0</div>
+                  <div class="kpi-l">B->A</div>
+                </div>
+              </div>
+              <div class="kpi-row">
+                <div class="kpi">
+                  <div class="kpi-v" id="detailedTotal">0</div>
+                  <div class="kpi-l">总计</div>
+                </div>
+                <div class="kpi">
+                  <div class="kpi-v" id="detailedAvg">0.0</div>
+                  <div class="kpi-l">平均/分钟</div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <div id="classStatsContainer"></div>
+          <p class="muted center">统计数据实时刷新</p>
+        </div>
+
+        <div class="tab-body" id="tab-settings">
+          <section class="sec">
+            <h3 class="sec-title">YOLO 检测</h3>
+            <div class="sec-inner">
+              <div class="field">
+                <label>置信度</label
+                ><input
+                  type="number"
+                  id="settConfidence"
+                  min="0.1"
+                  max="0.9"
+                  step="0.05"
+                  value="0.5"
+                />
+              </div>
+            </div>
+          </section>
+          <section class="sec">
+            <h3 class="sec-title">跟踪</h3>
+            <div class="sec-inner">
+              <div class="field">
+                <label>最大丢失帧</label
+                ><input
+                  type="number"
+                  id="settMaxAge"
+                  min="1"
+                  max="30"
+                  value="5"
+                />
+              </div>
+              <div class="field">
+                <label>确认帧数</label
+                ><input
+                  type="number"
+                  id="settMinHits"
+                  min="1"
+                  max="10"
+                  value="3"
+                />
+              </div>
+            </div>
+          </section>
+          <section class="sec">
+            <h3 class="sec-title">显示</h3>
+            <div class="sec-inner">
+              <div class="field">
+                <label>丢失阈值</label
+                ><input
+                  type="number"
+                  id="settInvisible"
+                  min="0"
+                  max="10"
+                  value="2"
+                />
+              </div>
+              <div class="checks">
+                <label
+                  ><input type="checkbox" id="settShowBbox" checked />
+                  边界框</label
+                >
+                <label
+                  ><input type="checkbox" id="settShowLabel" checked />
+                  标签ID</label
+                >
+                <label
+                  ><input type="checkbox" id="settShowCenter" checked />
+                  中心点</label
+                >
+                <label
+                  ><input type="checkbox" id="settShowTrajectory" checked />
+                  轨迹</label
+                >
+              </div>
+              <div class="field">
+                <label>统计字体</label
+                ><input
+                  type="number"
+                  id="settStatsFontScale"
+                  min="0.3"
+                  max="4"
+                  step="0.1"
+                  value="0.8"
+                />
+              </div>
+              <div class="field">
+                <label>线粗细</label
+                ><input
+                  type="number"
+                  id="settLineThickness"
+                  min="1"
+                  max="10"
+                  value="3"
+                />
+              </div>
+              <div class="field">
+                <label>框粗细</label
+                ><input
+                  type="number"
+                  id="settBboxThickness"
+                  min="1"
+                  max="10"
+                  value="2"
+                />
+              </div>
+              <div class="field">
+                <label>标签字体</label
+                ><input
+                  type="number"
+                  id="settLabelFontScale"
+                  min="0.3"
+                  max="4"
+                  step="0.1"
+                  value="0.6"
+                />
+              </div>
+              <div class="field">
+                <label>中心点大小</label
+                ><input
+                  type="number"
+                  id="settCenterSize"
+                  min="1"
+                  max="20"
+                  value="4"
+                />
+              </div>
+            </div>
+          </section>
+          <section class="sec">
+            <h3 class="sec-title">快速预设</h3>
+            <div class="sec-inner">
+              <div class="row wrap">
+                <button class="btn secondary" onclick="loadPreset('standard')">
+                  标准
+                </button>
+                <button class="btn secondary" onclick="loadPreset('crowded')">
+                  拥挤
+                </button>
+                <button class="btn secondary" onclick="loadPreset('sparse')">
+                  稀疏
+                </button>
+              </div>
+              <button class="btn accent" onclick="applySettings()">
+                应用设置
+              </button>
+              <button class="btn secondary" onclick="saveConfig()">
+                保存配置
+              </button>
+            </div>
+          </section>
+        </div>
+      </aside>
+    </div>
+
+    <div class="overlay hidden" id="analysisModal">
+      <div class="dialog">
+        <h3>快速分析</h3>
+        <div class="prog-bar">
+          <div class="prog-fill" id="analysisProgress"></div>
+        </div>
+        <p class="prog-text" id="analysisStatus">准备中...</p>
+        <button class="btn danger" onclick="stopAnalysis()">取消</button>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,124 @@
+# Sync .project/sourceTexts/ folder (source text files)
+
+# Don't sync user-specific SQLite databases
+.project/*.sqlite
+
+# Don't sync SQLite auxiliary files
+.project/*.sqlite-wal
+.project/*.sqlite-shm
+
+# Don't sync user-specific files
+.project/complete_drafts.txt
+.project/localProjectSettings.json
+.project/localProjectSwap.json
+copilot-messages.log
+
+# Archive formats
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.gz
+*.bz2
+*.xz
+
+# Windows executables and installers
+*.exe
+*.msi
+*.bat
+*.cmd
+*.com
+*.scr
+*.dll
+
+# macOS executables and disk images
+*.dmg
+*.pkg
+
+# Disk images and virtual machine files
+*.iso
+*.img
+*.vhd
+*.vmdk
+
+# System files
+.DS_Store
+.project/attachments/files/**
+
+# Frontend (Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+
+# Model weights and binaries
+*.pt
+*.pth
+*.onnx
+*.engine
+*.tflite
+
+# Video files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wmv
+
+# Training outputs and caches
+runs/
+benchmark_results/
+*.npz
+
+# Uploaded data
+data/uploads/
+
+# Python virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+
+# Debug/temp scripts
+a.py
+debug_*.py
+generate_formulas.py
+dataset_sampler.py
+
+# Temp log files
+tmp_uvicorn_*.log
+error.txt
+error_log.txt
+
+# IDE - Trae / Claude
+.trae/
+.claude/
+
+# Runtime logs and charts
+data/logs/
+
+# Thesis/academic files
+files/
+training/chapter5_figures/
+training/chapter5_diagrams*.py
+training/chapter5_visualization.py
+training/generate_drawio_diagrams.py
+training/generate_results_plot.py
+training/benchmark_results.txt

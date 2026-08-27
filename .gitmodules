@@ -1,0 +1,4 @@
+[submodule "ultralytics"]
+	path = ultralytics
+	url = https://github.com/jianjdd/ultralytics.git
+	branch = dense-pedestrian

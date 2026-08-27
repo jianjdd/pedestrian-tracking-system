@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+pydantic-settings
+python-multipart
+jinja2
+sqlalchemy
+PyMySQL
+alembic
+numpy
+scipy
+opencv-python-headless
+pandas
+matplotlib
+torch
+ultralytics

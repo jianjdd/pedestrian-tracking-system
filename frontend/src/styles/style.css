@@ -1,0 +1,827 @@
+﻿/* ===========================================
+   琛屼汉杩借釜绯荤粺 - 閲嶆瀯鐗堟牱锟?
+   鏍稿績锛歱osition-based 婊氬姩锛屼晶鏍忓竷灞€
+   =========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --c-bg: #0f1117;
+    --c-surface: #1a1d27;
+    --c-surface2: #232733;
+    --c-border: #2d3142;
+    --c-text: #e4e7ee;
+    --c-text2: #8b92a5;
+    --c-text3: #5c6278;
+    --c-accent: #6366f1;
+    --c-accent2: #818cf8;
+    --c-green: #22c55e;
+    --c-yellow: #eab308;
+    --c-red: #ef4444;
+    --c-cyan: #06b6d4;
+    --r: 10px;
+    --r-sm: 6px;
+    --topbar-h: 52px;
+    --sidebar-w: 420px;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--c-bg);
+    color: var(--c-text);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ===== 椤舵爮 ===== */
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--topbar-h);
+    background: var(--c-surface);
+    border-bottom: 1px solid var(--c-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 50;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    font-size: 22px;
+}
+
+.app-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--c-surface2);
+    border: 1px solid var(--c-border);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--c-red);
+}
+
+.status-dot.ready {
+    background: var(--c-yellow);
+}
+
+.status-dot.running {
+    background: var(--c-green);
+    animation: blink 1.4s infinite;
+}
+
+.status-dot.paused {
+    background: var(--c-yellow);
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1
+    }
+
+    50% {
+        opacity: .3
+    }
+}
+
+/* ===== 涓讳綋甯冨眬锛坧osition-based锛屼笉渚濊禆 flex 宓屽锟?===== */
+.app-body {
+    position: fixed;
+    top: var(--topbar-h);
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/* ===== 瑙嗛锟?===== */
+.video-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: var(--sidebar-w);
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+}
+
+.video-box {
+    flex: 1;
+    position: relative;
+    background: #000;
+    border-radius: var(--r);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+}
+
+.video-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.video-box canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    display: none;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.video-empty {
+    position: absolute;
+    text-align: center;
+    color: var(--c-text3);
+}
+
+.empty-icon {
+    font-size: 56px;
+    margin-bottom: 10px;
+    opacity: .5;
+}
+
+.video-empty p {
+    font-size: 14px;
+}
+
+/* 瑙嗛搴曢儴锟?*/
+.video-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.line-tools {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tb {
+    padding: 7px 12px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    color: var(--c-text2);
+    border-radius: var(--r-sm);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: .15s;
+}
+
+.tb:hover:not(:disabled) {
+    border-color: var(--c-accent);
+    color: var(--c-text);
+}
+
+.tb:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+.tb.active {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+    color: #fff;
+}
+
+.line-hint {
+    font-size: 12px;
+    color: var(--c-yellow);
+    margin-left: 4px;
+}
+
+.line-hint.ok {
+    color: var(--c-green);
+}
+
+/* 蹇嵎缁熻 */
+.quick-stats {
+    display: flex;
+    gap: 8px;
+}
+
+.qs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+}
+
+.qs.total {
+    border-color: var(--c-accent);
+}
+
+.qs-label {
+    font-size: 12px;
+    color: var(--c-text3);
+    font-weight: 500;
+}
+
+.qs-val {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--c-text);
+}
+
+.qs.total .qs-val {
+    color: var(--c-accent2);
+}
+
+/* ===== 渚ф爮锛坧osition-based 婊氬姩锟?00% 鍙潬锟?===== */
+.sidebar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--c-surface);
+    border-left: 1px solid var(--c-border);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 鏍囩椤靛ご */
+.sidebar-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--c-border);
+    flex-shrink: 0;
+}
+
+.tab {
+    flex: 1;
+    padding: 14px 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--c-text3);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.tab:hover {
+    color: var(--c-text2);
+}
+
+.tab.active {
+    color: var(--c-accent2);
+    border-bottom-color: var(--c-accent);
+}
+
+/* 鏍囩椤靛唴瀹癸細鍏抽敭锛佺敤 position:absolute 纭繚婊氬姩 */
+.tab-body {
+    display: none;
+    position: absolute;
+    top: 49px;
+    /* tabs 楂樺害 */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.tab-body.active {
+    display: block;
+}
+
+.tab-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+.tab-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tab-body::-webkit-scrollbar-thumb {
+    background: var(--c-border);
+    border-radius: 3px;
+}
+
+/* ===== Section 鍗＄墖 ===== */
+.sec {
+    background: var(--c-surface2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r);
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.sec-title {
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--c-text2);
+    border-bottom: 1px solid var(--c-border);
+    text-transform: uppercase;
+    letter-spacing: .3px;
+}
+
+.sec-inner {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ===== 閫氱敤缁勪欢 ===== */
+/* 寰界珷 */
+.badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 4px;
+    background: rgba(239, 68, 68, .15);
+    color: var(--c-red);
+}
+
+.badge.ok {
+    background: rgba(34, 197, 94, .15);
+    color: var(--c-green);
+}
+
+/* 鎸夐挳 */
+.btn {
+    padding: 9px 14px;
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+    color: var(--c-text);
+    border-radius: var(--r-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .15s;
+    text-align: center;
+}
+
+.btn:hover:not(:disabled) {
+    border-color: var(--c-accent);
+}
+
+.btn:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+.btn.primary {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+    color: #fff;
+}
+
+.btn.primary:hover:not(:disabled) {
+    background: #5558e6;
+}
+
+.btn.secondary {
+    background: var(--c-surface2);
+}
+
+.btn.go {
+    background: var(--c-green);
+    border-color: var(--c-green);
+    color: #000;
+    font-weight: 700;
+}
+
+.btn.go:hover:not(:disabled) {
+    background: #16a34a;
+}
+
+.btn.warn {
+    background: var(--c-yellow);
+    border-color: var(--c-yellow);
+    color: #000;
+    font-weight: 700;
+}
+
+.btn.warn:hover:not(:disabled) {
+    background: #ca8a04;
+}
+
+.btn.danger {
+    background: var(--c-red);
+    border-color: var(--c-red);
+    color: #fff;
+}
+
+.btn.danger:hover:not(:disabled) {
+    background: #dc2626;
+}
+
+.btn.accent {
+    background: linear-gradient(135deg, var(--c-accent), var(--c-cyan));
+    border: none;
+    color: #fff;
+}
+
+.btn.accent:hover:not(:disabled) {
+    opacity: .9;
+}
+
+.btn.sm {
+    padding: 7px 10px;
+    font-size: 12px;
+}
+
+.btn.xs {
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+/* 鎺у埗鎸夐挳缃戞牸 */
+.ctrl-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+/* 锟?*/
+.row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.row.wrap {
+    flex-wrap: wrap;
+}
+
+.row select {
+    flex: 1;
+    padding: 7px 10px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    color: var(--c-text);
+    border-radius: var(--r-sm);
+    font-size: 13px;
+}
+
+.lbl {
+    font-size: 13px;
+    color: var(--c-text3);
+    white-space: nowrap;
+}
+
+/* 瀛楁 */
+.field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.field label {
+    min-width: 90px;
+    font-size: 13px;
+    color: var(--c-text2);
+}
+
+.field input[type="number"] {
+    width: 70px;
+    padding: 5px 8px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    color: var(--c-text);
+    border-radius: var(--r-sm);
+    font-size: 13px;
+    text-align: center;
+}
+
+.field input:focus {
+    border-color: var(--c-accent);
+    outline: none;
+}
+
+.field .hint {
+    font-size: 11px;
+    color: var(--c-text3);
+}
+
+/* 澶嶉€夋 */
+.checks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+}
+
+.checks label {
+    font-size: 12px;
+    color: var(--c-text2);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: .1s;
+}
+
+.checks label:hover {
+    background: var(--c-bg);
+}
+
+.checks input {
+    accent-color: var(--c-accent);
+}
+
+/* 绫诲埆缃戞牸 */
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+}
+
+.class-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    padding: 4px 8px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: .1s;
+}
+
+.class-chip:hover {
+    border-color: var(--c-accent);
+}
+
+.class-chip input {
+    accent-color: var(--c-accent);
+}
+
+/* KPI */
+.kpi-row {
+    display: flex;
+    gap: 8px;
+}
+
+.kpi {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+}
+
+.kpi-v {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--c-green);
+}
+
+.kpi-l {
+    font-size: 11px;
+    color: var(--c-text3);
+    margin-top: 2px;
+}
+
+/* 鍥捐〃 */
+.chart-wrap {
+    height: 160px;
+    position: relative;
+}
+
+.chart-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* 淇℃伅锟?*/
+.info-box {
+    font-size: 13px;
+    color: var(--c-text2);
+    line-height: 1.8;
+    padding: 10px;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+}
+
+/* 杈呭姪 */
+.muted {
+    font-size: 12px;
+    color: var(--c-text3);
+}
+
+.center {
+    text-align: center;
+    padding: 10px;
+}
+
+/* 鍒嗙被缁熻锟?*/
+.cls-card {
+    background: var(--c-surface2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r);
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+.cls-card-h {
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--c-border);
+    color: var(--c-text2);
+}
+
+.cls-card-b {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    padding: 10px 12px;
+}
+
+.cls-item {
+    text-align: center;
+}
+
+.cls-item .v {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--c-cyan);
+}
+
+.cls-item .l {
+    font-size: 11px;
+    color: var(--c-text3);
+}
+
+/* 鏃ュ織鍒楄〃 */
+.log-list-inner {
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.log-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    border: 1px solid var(--c-border);
+    border-radius: 4px;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.log-entry a {
+    color: var(--c-accent2);
+    text-decoration: none;
+}
+
+.log-entry a:hover {
+    text-decoration: underline;
+}
+
+/* ===== 寮圭獥 ===== */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, .6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+.dialog {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    padding: 28px;
+    border-radius: var(--r);
+    min-width: 360px;
+    text-align: center;
+}
+
+.dialog h3 {
+    margin-bottom: 16px;
+}
+
+.prog-bar {
+    height: 8px;
+    background: var(--c-bg);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.prog-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--c-accent), var(--c-cyan));
+    border-radius: 4px;
+    transition: width .3s;
+}
+
+.prog-text {
+    font-size: 13px;
+    color: var(--c-text2);
+    margin-bottom: 14px;
+}
+
+/* ===== Toast ===== */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 18px;
+    background: var(--c-surface2);
+    color: var(--c-text);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+    z-index: 200;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: .25s;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast.error {
+    border-color: var(--c-red);
+}
+
+.toast.success {
+    border-color: var(--c-green);
+}
+
+/* ===== 鍝嶅簲锟?===== */
+@media (max-width: 1000px) {
+    :root {
+        --sidebar-w: 340px;
+    }
+}
+
+

@@ -1,0 +1,9 @@
+# MOT17 数据集配置
+# 使用 convert_mot17.py 转换后，修改 path 为你的实际输出路径
+
+path: E:/datasets/MOT17_yolo   # ← 修改为你的转换输出目录
+train: images/train
+val: images/val
+
+nc: 1
+names: ['person']
